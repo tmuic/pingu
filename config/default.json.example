@@ -1,0 +1,11 @@
+{
+  "jira": {
+    "host": "",
+    "username": "",
+    "password": ""
+  },
+  "slack": {
+    "logging": false,
+    "token": ""
+  }
+}
