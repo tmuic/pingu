@@ -62,7 +62,6 @@ function postJiraIssue(slack, data)
             break;
         }
 
-        // error.errorMessages[0]
         slack.sendMsg(data.channel, '<@'+data.user+'>: Noot Noot! '+errorMessage);
     });
     return true;
@@ -73,6 +72,6 @@ function postJiraIssue(slack, data)
 
 module.exports = {
   exec: function (slack, data) {
-    postJiraIssue(slack, data);
+    return postJiraIssue(slack, data);
   }
 };
