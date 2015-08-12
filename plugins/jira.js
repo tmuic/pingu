@@ -10,7 +10,7 @@ var jira    = new jiraAPI( {
 
 function postJiraIssue(slack, data)
 {
-  var matches, issueRegex = /(?:\s|^)!([A-Z]+-[0-9]+)(?=\s|$)/g;
+  var matches, issueRegex = /(?:\s|^)!([A-Z]+-[0-9]+)/g;
 
   while (matches = issueRegex.exec(data.text)) {
     jira.issue.getIssue({
