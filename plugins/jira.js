@@ -63,7 +63,7 @@ function postJiraIssue(slack, data)
         }
 
         // error.errorMessages[0]
-        slack.sendMsg(data.channel, '<@'+data.user+'>: Sorry, hun! '+errorMessage);
+        slack.sendMsg(data.channel, '<@'+data.user+'>: Noot Noot! '+errorMessage);
     });
     return true;
   }
