@@ -1,23 +1,14 @@
 module.exports = {
   exec: function (slack, data) {
-    var matches, helpRegex = /^<@U08TS076K> help$/g;
+    var matches, helpRegex = /^help[\.\!\?]*\b|\bhelp[\.\!\?]*$|^help[\.\!\?]*$/i;
 
     if (helpRegex.exec(data.text) !== null) {
       var channel;
 
       if (data.channel.substr(0, 1) === 'D') {
-        channel = data.channel;
-      } else {
-        channel = data.user;
+        slack.sendMsg(data.channel, 'Commands:\n>jira\tRetrieve information about a JIRA issue.\nTo learn more about a specific command, type `help :command`.');
+        return true;
       }
-
-      slack.sendMsg(channel, 'Sorry, I can\'t help you! My flippers can only retrieve JIRA issues for now, but in the future I hope I can do lots of other cool things!');
-
-      if (data.channel !== channel) {
-        slack.sendMsg(data.channel, '<@'+data.user+'>: I DM\'d you! ;)');
-      }
-
-      return true;
     }
 
     return false;
