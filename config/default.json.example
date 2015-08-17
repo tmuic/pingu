@@ -1,8 +1,13 @@
 {
+  "debug": false,
   "jira": {
     "host": "",
     "username": "",
     "password": ""
+  },
+  "redis": {
+    "host": "127.0.0.1",
+    "port": 6379
   },
   "slack": {
     "logging": false,
