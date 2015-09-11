@@ -7,8 +7,10 @@ var pingu   = require('./lib/pingu');
 var plugins = {
   jira: require('./lib/plugins/jira'),
   mention: require('./lib/plugins/mention'),
+  zendesk: require('./lib/plugins/zendesk')
 };
 
 pingu.loadPlugin(plugins.jira);
 pingu.loadPlugin(plugins.mention);
+pingu.loadPlugin(plugins.zendesk);
 pingu.listen();

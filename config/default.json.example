@@ -12,5 +12,10 @@
   "slack": {
     "logging": false,
     "token": ""
+  },
+  "zendesk": {
+    "username": "",
+    "token": "",
+    "url": "https://subdomain.zendesk.com"
   }
 }
