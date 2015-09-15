@@ -5,6 +5,7 @@
         "This file is @generated automatically"
     ],
     "hash": "2bf00bc3fdf5b9f04817b879837a05f0",
+    "content-hash": "77aa05d5e67e457caa4ee6d3ef25f19e",
     "packages": [
         {
             "name": "chobie/jira-api-restclient",
