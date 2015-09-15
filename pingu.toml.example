@@ -20,3 +20,8 @@ port = 6379
 name = "Pingu"
 token = ""
 channel = ""
+
+[zendesk]
+subdomain = ""
+username = ""
+token = ""
