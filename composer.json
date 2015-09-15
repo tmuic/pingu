@@ -1,0 +1,23 @@
+{
+    "autoload": {
+        "psr-4": {
+            "Pingu\\": "src/"
+        }
+    },
+    "require": {
+        "cilex/cilex": "~1.0",
+        "chobie/jira-api-restclient": "2.0.x-dev",
+        "frlnc/php-slack": "~1.0",
+        "monolog/monolog": "~1.0",
+        "pda/pheanstalk": "~3.0",
+        "sebastian/version": "~1.0",
+        "symfony/process": "~2.0",
+        "tedivm/stash": "0.13.*",
+        "yosymfony/toml": "0.3.*"
+    },
+    "config": {
+        "preferred-install": "dist"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

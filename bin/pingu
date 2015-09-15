@@ -1,0 +1,63 @@
+#!/usr/bin/env php
+<?php
+use Pingu\Pingu;
+
+function shortest_path($path) {
+    $currentDir = str_replace('\\', '/', getcwd());
+    $path       = str_replace('\\', '/', $path);
+    $parts      = explode('/', $path);
+    $oldKey     = null;
+
+    foreach ($parts as $key => $part) {
+        switch ($part) {
+            case '.':
+                unset($parts[$key]);
+                break;
+            case '..':
+                unset($parts[$key]);
+                unset($parts[$oldKey]);
+                $oldKey--;
+                break;
+            default:
+                $oldKey = $key;
+                break;
+        }
+    }
+
+    return str_replace($currentDir, '.', implode('/', $parts));
+}
+
+for ($i = 4; $i >= 0; $i--) {
+    $dir  = shortest_path(__DIR__.str_repeat('/..', $i));
+    $file = $dir.'/vendor/autoload.php';
+    if (file_exists($file) === true) {
+        define('COMPOSER_INSTALL', $file);
+        break;
+    }
+}
+
+if (defined('COMPOSER_INSTALL') === false) {
+    fwrite(
+        STDERR,
+        'You need to set up the project dependencies using the following commands:'.PHP_EOL.
+        'wget http://getcomposer.org/composer.phar'.PHP_EOL.
+        'php composer.phar install'.PHP_EOL
+    );
+    die(1);
+}
+
+$configFile = shortest_path(getcwd().'/pingu.toml');
+
+if (file_exists($configFile) === false) {
+    $examplePath = shortest_path(__DIR__.'/../pingu.toml.example');
+    fwrite(
+        STDERR,
+        'You need create a configuration file using the following command:'.PHP_EOL.
+        'cp '.$examplePath.' '.$configFile.PHP_EOL
+    );
+    die(1);
+}
+
+require COMPOSER_INSTALL;
+
+Pingu::bootstrap($configFile);

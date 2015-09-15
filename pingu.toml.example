@@ -1,0 +1,22 @@
+# Pingu 2.0-dev Configuration
+[pingu]
+debug = true
+
+[beanstalkd]
+host = "127.0.0.1"
+port = 11300
+tube = "pingu"
+
+[jira]
+host = ""
+username = ""
+password = ""
+
+[redis]
+host = "127.0.0.1"
+port = 6379
+
+[slack]
+name = "Pingu"
+token = ""
+channel = ""
