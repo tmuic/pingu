@@ -38,10 +38,10 @@ final class WorkCommand extends CommandAbstract
 
         try {
             $handler->handle($payload->payload);
-            $this->pingu['queue']->release($job);
+            $this->pingu['queue']->delete($job);
         } catch (\Exception $e) {
             // @todo: do something with errors.
-            $this->pingu['queue']->bury($job);
+            $this->pingu['queue']->delete($job);
         }
     }
 }
