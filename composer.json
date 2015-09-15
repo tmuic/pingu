@@ -2,7 +2,10 @@
     "autoload": {
         "psr-4": {
             "Pingu\\": "src/"
-        }
+        },
+        "files": [
+            "functions.php"
+        ]
     },
     "require": {
         "cilex/cilex": "~1.0",
