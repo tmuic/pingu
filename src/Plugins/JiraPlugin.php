@@ -53,8 +53,13 @@ final class JiraPlugin extends PluginAbstract
             $errorMessage = '@'.$user['name'].': I was unable to retrieve '.$invalid.'.';
         }
 
-        $this->pingu['slack']->sendMessage($payload->channel, '', $attachments);
-        $this->pingu['slack']->sendMessage($payload->channel, $errorMessage);
+        if (empty($attachments) === false) {
+            $this->pingu['slack']->sendMessage($payload->channel, '', $attachments);
+        }
+
+        if ($errorMessage !== '') {
+            $this->pingu['slack']->sendMessage($payload->channel, $errorMessage);
+        }
     }
 
     private function createIssueAttachment(array $issue)
