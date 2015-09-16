@@ -1,6 +1,7 @@
 <?php
 namespace Pingu\Commands;
 
+use Pheanstalk\Job;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -19,7 +20,12 @@ final class WorkCommand extends CommandAbstract
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $job     = $this->pingu['queue']->reserve();
+        $job = $this->pingu['queue']->reserve(0);
+
+        if ($job instanceof Job === false) {
+            return;
+        }
+
         $payload = json_decode($job->getData());
         $handler = null;
 

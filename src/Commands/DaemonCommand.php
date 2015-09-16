@@ -29,6 +29,8 @@ final class DaemonCommand extends CommandAbstract
             if ((memory_get_usage() / 1024 / 1024) >= 128) {
                 die;
             }
+
+            sleep(3);
         }
     }
 }
