@@ -50,7 +50,17 @@ final class MessageHandler extends HandlerAbstract
             foreach ($this->triggers as $trigger => $handlers) {
                 if (preg_match_all($trigger, $payload->text, $matches) > 0) {
                     foreach ($handlers as $handler) {
-                        call_user_func($handler, $payload, $matches);
+                        try {
+                            call_user_func($handler, $payload, $matches);
+                        } catch (\Exception $e) {
+                            $this->pingu['logger']->addError($e);
+                            if (isset($payload->channel) and isset($payload->user) and $payload->channel !== $this->pingu['config']['slack']['channel']) {
+                                $user         = $this->pingu['slack']->getUser($payload->user);
+                                $errorMessage = '@'.$user['name'].': Your message made me crash unexpectedly. Thanks for that!';
+   
+                                $this->pingu['slack']->sendMessage($payload->channel, $errorMessage);
+                            }
+                        }
                     }
                 }
             }

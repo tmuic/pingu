@@ -46,7 +46,7 @@ final class WorkCommand extends CommandAbstract
             $handler->handle($payload->payload);
             $this->pingu['queue']->delete($job);
         } catch (\Exception $e) {
-            // @todo: do something with errors.
+            $this->pingu['logger']->addError($e);
             $this->pingu['queue']->delete($job);
         }
     }
