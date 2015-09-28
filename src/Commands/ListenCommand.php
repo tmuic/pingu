@@ -27,7 +27,7 @@ final class ListenCommand extends CommandAbstract
 
 
         $pingu['slack']->getRTM($loop)->then(new SocketHandler($pingu), function ($e) use ($loop, $output) {
-            $output->writeln($e->getMessage());
+            $output->writeln('<error>'.$e->getMessage().'</error>');
             $loop->stop();
         });
 
