@@ -5,12 +5,17 @@ use Frlnc\Slack\Http\SlackResponseFactory;
 use Frlnc\Slack\Http\CurlInteractor;
 use Frlnc\Slack\Core\Commander;
 use Pingu\Exceptions\SlackException;
+use Ramsey\Uuid\Uuid;
+use Ratchet\Client\Factory as ClientFactory;
+use Ratchet\Client\WebSocket;
+use React\EventLoop\LoopInterface;
 use Stash\Interfaces\PoolInterface;
 use Stash\Pool;
 
 final class Slack
 {
     private $cache;
+    private $connection;
     private $client;
     private $errors = [
         'account_inactive'  => 'Authentication token is for a deleted user or team.',
@@ -25,6 +30,7 @@ final class Slack
         'user_not_found'    => 'Value passed for user was invalid.',
         'user_not_visible'  => 'The requested user is not visible to the calling user.',
     ];
+    private $rtm;
     private $token;
 
     public function __construct($token, PoolInterface $cache = null)
@@ -36,6 +42,11 @@ final class Slack
 
         $this->cache->setNamespace('pingu');
         $interactor->setResponseFactory(new SlackResponseFactory);
+    }
+
+    public function getConnection()
+    {
+        return $this->connection;
     }
 
     public function getMe()
@@ -53,6 +64,21 @@ final class Slack
         }
 
         return $user;
+    }
+
+    public function getRTM(LoopInterface $eventLoop)
+    {
+        if ($this->rtm === null) {
+            $connector = new ClientFactory($eventLoop);
+            $response  = $this->makeRequest('rtm.start', [
+                'no_unreads'    => '',
+                'simple_latest' => '',
+            ]);
+
+            $this->rtm = $connector($response['url']);
+        }
+
+        return $this->rtm;
     }
 
     public function getUser($userId)
@@ -74,6 +100,11 @@ final class Slack
         return $user;
     }
 
+    public function ping()
+    {
+        $this->sendRTM('ping');
+    }
+
     public function sendMessage($channel, $message, $attachments = [])
     {
         $this->makeRequest('chat.postMessage', [
@@ -85,6 +116,11 @@ final class Slack
             'unfurl_media' => true,
             'attachments'  => json_encode($attachments),
         ]);
+    }
+
+    public function setConnection(WebSocket $connection)
+    {
+        $this->connection = $connection;
     }
 
     private function makeRequest($method, $data = [])
@@ -101,5 +137,19 @@ final class Slack
         }
 
         return $body;
+    }
+
+    private function sendRTM($type)
+    {
+        $connection = $this->getConnection();
+
+        if ($connection === null) {
+            throw new SlackException('No RTM connection available');
+        }
+
+        $connection->send(json_encode([
+            'id'   => Uuid::uuid1()->toString(),
+            'type' => $type,
+        ]));
     }
 }

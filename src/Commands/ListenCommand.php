@@ -1,6 +1,7 @@
 <?php
 namespace Pingu\Commands;
 
+use Pingu\Handlers\SocketHandler;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
@@ -21,35 +22,15 @@ final class ListenCommand extends CommandAbstract
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $listenerPath = __DIR__.'/../../listener.js';
+        $pingu = $this->pingu;
+        $loop  = $pingu['loop'];
 
-        if (file_exists($listenerPath) === false) {
-            throw new \RuntimeException('Unable to find listener at '.$listenerPath);
-        }
 
-        $listenerPath = ProcessUtils::escapeArgument($listenerPath);
-        $slackToken   = ProcessUtils::escapeArgument($this->pingu['config']['slack']['token']);
-        $process      = new Process(sprintf('node %s %s', $listenerPath, $slackToken));
-
-        $process->setTimeout(0);
-        $process->start();
-
-        //$pid = $process->getPid(); // @todo: Store the pid somewhere so we can check it in a future web interface.
-
-        $process->wait(function ($type, $buffer) {
-            if (Process::ERR === $type) {
-                // @todo: Log errors.
-                return;
-            }
-
-            $payload = json_decode($buffer);
-
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                // @todo: Handle invalid JSON.
-                return;
-            }
-
-            $this->pingu['queue']->put(json_encode($payload));
+        $pingu['slack']->getRTM($loop)->then(new SocketHandler($pingu), function ($e) use ($loop, $output) {
+            $output->writeln($e->getMessage());
+            $loop->stop();
         });
+
+        $loop->run();
     }
 }

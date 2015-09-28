@@ -1,20 +1,43 @@
 <?php
-namespace Pingu\Handlers;
+namespace Pingu\Types;
 
-use Ratchet\Client\WebSocket;
+use Pingu\Pingu;
 
-class MessageHandler extends HandlerAbstract
+final class MessageType extends TypeAbstract
 {
-    public function __invoke($msg) {
-        $payload = json_decode($msg);
-        $handler = null;
+    const EVENT = 'message';
 
-        if (isset($payload->type) === false) {
-            print 'unknown payload'.PHP_EOL;
+    private $triggers = [];
+    private $types    = [];
+
+    public function __construct(Pingu $pingu)
+    {
+        parent::__construct($pingu);
+
+        $pinguId = $this->pingu->getId();
+        foreach ($this->pingu['plugins'] as $plugin) {
+            foreach ($plugin->getTriggers() as $trigger => $handler) {
+                $trigger = str_replace('{:pingu:}', $pinguId, $trigger);
+                $this->triggers[$trigger][] = [$plugin, $handler];
+            }
+
+            foreach ($plugin->getTypes() as $type => $handler) {
+                $this->types[$type][] = [$plugin, $handler];
+            }
+        }
+    }
+
+    public function getEvent()
+    {
+        return self::EVENT;
+    }
+
+    public function handle(\StdClass $payload)
+    {
+        if ($this->shouldHandleMessage($payload) === false) {
             return;
         }
 
-<<<<<<< 04c925962472ec337e74183da16ea2aade0a3130
         if (isset($payload->subtype) === true) {
             if (isset($this->types[$payload->subtype]) === true) {
                 foreach ($this->types[$payload->subtype] as $handler) {
@@ -34,31 +57,26 @@ class MessageHandler extends HandlerAbstract
                             if (isset($payload->channel) and isset($payload->user) and $payload->channel !== $this->pingu['config']['slack']['channel']) {
                                 $user         = $this->pingu['slack']->getUser($payload->user);
                                 $errorMessage = '@'.$user['name'].': Your message made me crash unexpectedly. Thanks for that!';
-   
+
                                 $this->pingu['slack']->sendMessage($payload->channel, $errorMessage);
                             }
                         }
                     }
                 }
-=======
-        foreach ($this->pingu['types'] as $potentialHandler) {
-            if ($potentialHandler->getEvent() === $payload->type) {
-                $handler = $potentialHandler;
-                continue;
->>>>>>> Use WebSockets through PHP to improve latency
             }
         }
+    }
 
-        if ($handler === null) {
-            print 'no handler found for '.$payload->type.PHP_EOL;
-            return;
+    private function shouldHandleMessage(\StdClass $payload)
+    {
+        if (isset($payload->reply_to) === true) {
+            return false;
         }
 
-        try {
-            print 'handle '.$payload->type.' here'.PHP_EOL;
-            $handler->handle($payload);
-        } catch (\Exception $e) {
-            // @todo: do something with errors.
+        if (isset($payload->user) === true and $payload->user === $this->pingu->getId()) {
+            return false;
         }
+
+        return true;
     }
 }

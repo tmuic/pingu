@@ -1,8 +1,8 @@
 <?php
 namespace Pingu\Interfaces;
 
-interface HandlerInterface
+interface TypeInterface
 {
-    public function getEventType();
+    public function getEvent();
     public function handle(\StdClass $payload);
 }

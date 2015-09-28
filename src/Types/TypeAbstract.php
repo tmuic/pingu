@@ -1,9 +1,10 @@
 <?php
-namespace Pingu\Handlers;
+namespace Pingu\Types;
 
+use Pingu\Interfaces\TypeInterface;
 use Pingu\Pingu;
 
-abstract class HandlerAbstract
+abstract class TypeAbstract implements TypeInterface
 {
     protected $pingu;
 

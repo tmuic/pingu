@@ -9,6 +9,7 @@ use Monolog\Logger;
 use Pheanstalk\Pheanstalk;
 use Pingu\Services\Jira;
 use Pingu\Services\Slack;
+use React\EventLoop\Factory as EventLoopFactory;
 use SebastianBergmann\Version;
 use Stash\Driver\Redis;
 use Stash\Pool;
@@ -24,14 +25,14 @@ final class Pingu extends Application
         '\\Pingu\\Commands\\WorkCommand',
     ];
 
-    static private $handlers = [
-        '\\Pingu\\Handlers\\LatencyHandler',
-        '\\Pingu\\Handlers\\MessageHandler',
-    ];
-
     static private $plugins = [
         '\\Pingu\\Plugins\\InteractionPlugin',
         '\\Pingu\\Plugins\\JiraPlugin',
+    ];
+
+    static private $types = [
+        '\\Pingu\\Types\\LatencyType',
+        '\\Pingu\\Types\\MessageType',
     ];
 
     private $me;
@@ -80,14 +81,14 @@ final class Pingu extends Application
             ]));
         });
 
-        $this['handlers'] = $this->share(function ($pingu) {
-            $handlers = [];
+        $this['types'] = $this->share(function ($pingu) {
+            $types = [];
 
-            foreach (self::$handlers as $handler) {
-                $handlers[] = new $handler($pingu);
+            foreach (self::$types as $type) {
+                $types[] = new $type($pingu);
             }
 
-            return $handlers;
+            return $types;
         });
 
         $this['jira'] = $this->share(function ($pingu) {
@@ -97,6 +98,10 @@ final class Pingu extends Application
                 $pingu['config']['jira']['password'],
                 $pingu['cache']
             );
+        });
+
+        $this['loop'] = $this->share(function ($pingu) {
+            return EventLoopFactory::create();
         });
 
         $this['logger'] = $this->share(function ($pingu) {
