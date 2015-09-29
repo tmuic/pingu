@@ -51,6 +51,7 @@ final class MessageType extends TypeAbstract
                 if (preg_match_all($trigger, $payload->text, $matches) > 0) {
                     foreach ($handlers as $handler) {
                         try {
+                            $this->pingu['slack']->type($payload->channel);
                             call_user_func($handler, $payload, $matches);
                         } catch (\Exception $e) {
                             $this->pingu['logger']->addError($e);

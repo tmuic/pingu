@@ -123,6 +123,13 @@ final class Slack
         $this->connection = $connection;
     }
 
+    public function type($channel)
+    {
+        $this->sendRTM('typing', [
+            'channel' => $channel,
+        ]);
+    }
+
     private function makeRequest($method, $data = [])
     {
         $response = $this->client->execute($method, $data);
@@ -139,7 +146,7 @@ final class Slack
         return $body;
     }
 
-    private function sendRTM($type)
+    private function sendRTM($type, $data = [])
     {
         $connection = $this->getConnection();
 
@@ -147,9 +154,9 @@ final class Slack
             throw new SlackException('No RTM connection available');
         }
 
-        $connection->send(json_encode([
+        $connection->send(json_encode(array_merge($data, [
             'id'   => Uuid::uuid1()->toString(),
             'type' => $type,
-        ]));
+        ])));
     }
 }

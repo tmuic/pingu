@@ -10,7 +10,6 @@ class MessageHandler extends HandlerAbstract
         $handler = null;
 
         if (isset($payload->type) === false) {
-            print 'unknown payload'.PHP_EOL;
             return;
         }
 
@@ -22,12 +21,10 @@ class MessageHandler extends HandlerAbstract
         }
 
         if ($handler === null) {
-            print 'no handler found for '.$payload->type.PHP_EOL;
             return;
         }
 
         try {
-            print 'handle '.$payload->type.' here'.PHP_EOL;
             $handler->handle($payload);
         } catch (\Exception $e) {
             // @todo: do something with errors.
